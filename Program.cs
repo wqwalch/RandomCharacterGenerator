@@ -43,7 +43,7 @@ namespace RandomCharacterGenerator
                 }
             }
 
-            Random random = new Random();
+            Random random = new Random((int)(DateTime.Now.Ticks % int.MaxValue));
             long numPrinted = 0;
             using (var sw = printingToOutput ? new StreamWriter(Console.OpenStandardOutput()) : new StreamWriter(printTo))
             {
