@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace RandomCharacterGenerator
@@ -43,7 +42,7 @@ namespace RandomCharacterGenerator
                 }
             }
 
-            Random random = new Random((int)(DateTime.Now.Ticks % int.MaxValue));
+            long seed = DateTime.Now.Ticks;
             long numPrinted = 0;
             using (var sw = printingToOutput ? new StreamWriter(Console.OpenStandardOutput()) : new StreamWriter(printTo))
             {
@@ -51,12 +50,12 @@ namespace RandomCharacterGenerator
                 {
                     if (printPretty)
                     {
-                        int rnd = random.Next(PRINTABLE_STRINGS.Length - 1);
+                        int rnd = GetNextXorValue(PRINTABLE_STRINGS.Length - 1, ref seed);
                         sw.Write(PRINTABLE_STRINGS[rnd]);
                     }
                     else
                     {
-                        int rnd = random.Next(255);
+                        int rnd = GetNextXorValue(255, ref seed);
                         sw.Write((char)(rnd));
                     }
                 }
@@ -80,6 +79,16 @@ namespace RandomCharacterGenerator
             Console.WriteLine("     Will write 10,000 characters to junk.txt");
             Console.WriteLine("  ./rndChrs.exe 50 --pretty");
             Console.WriteLine("     Will output 50 printable characters to console");
+        }
+        
+        static int GetNextXorValue(int max, ref long shifter)
+        {
+            shifter ^= shifter >> 12;
+            shifter ^= shifter << 25;
+            shifter ^= shifter >> 27;
+            long rnd = shifter;
+            shifter *= 0x2545F4914F6CDD1D;
+            return (int)(rnd % max);
         }
     }
 }
